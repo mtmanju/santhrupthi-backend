@@ -1,0 +1,23 @@
+# fly.toml app configuration file generated for santhrupthi-backend on 2025-05-06T20:38:15+05:30
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'santhrupthi-backend'
+primary_region = 'bom'
+
+[build]
+
+[http_service]
+  internal_port = 443
+  protocol = 'tcp'
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1

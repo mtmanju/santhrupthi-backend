@@ -1,0 +1,102 @@
+/* Base styles */
+body {
+    background-color: #444;
+    padding: 0 10px;
+    margin: 0;
+    min-width: fit-content;
+    font-family: Arial, sans-serif;
+}
+
+.page-container {
+    margin: 10px auto;
+    width: fit-content;
+}
+
+.page {
+    overflow: hidden;
+    position: relative;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.annotations-container {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+}
+
+.annotations-container > div {
+    position: absolute;
+    pointer-events: auto;
+    -webkit-user-select: none;
+}
+
+.annotations-container > div:hover {
+    background-color: rgba(255, 255, 0, 0.25);
+    cursor: pointer;
+}
+
+/* Custom fonts */
+@font-face {
+    font-family: 'Bahnschrift';
+    src: url('../fonts/Bahnschrift.woff2') format('woff2');
+}
+
+/* Content sections */
+.content-section {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-section {
+    text-align: center;
+    padding: 3rem 0;
+    background-color: #f8f9fa;
+    margin-bottom: 2rem;
+}
+
+.features-section {
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.donation-cta {
+    text-align: center;
+    padding: 2rem;
+    margin-top: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.donate-button {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.donate-button:hover {
+    background-color: #0056b3;
+}
+
+/* Utility classes */
+.text-center {
+    text-align: center;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+} 
