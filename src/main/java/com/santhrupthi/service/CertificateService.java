@@ -65,15 +65,19 @@ public class CertificateService {
             
             // Main title
             canvas.beginText();
-            canvas.setFontAndSize(baseFont, 54);
+            canvas.setFontAndSize(baseFont, 54); // Large title font
             canvas.setColorFill(BaseColor.WHITE);
             canvas.showTextAligned(Element.ALIGN_CENTER, "THANK YOU FOR YOUR DONATION!", centerX, centerY - 120, 0);
+            // Donor name (large, bold, uppercase)
+            canvas.setFontAndSize(baseFont, 64); // Even larger for donor name
+            canvas.setColorFill(BaseColor.WHITE);
+            canvas.showTextAligned(Element.ALIGN_CENTER, donorName != null ? donorName.toUpperCase() : "", centerX, centerY - 170, 0);
             // Subtitle (single line, smaller)
-            canvas.setFontAndSize(baseFont, 32);
-            canvas.showTextAligned(Element.ALIGN_CENTER, "YOU JUST FED A FAMILY. AND GAVE HOPE.", centerX, centerY - 170, 0);
+            canvas.setFontAndSize(baseFont, 36); // Subtitle font size
+            canvas.showTextAligned(Element.ALIGN_CENTER, "YOU JUST FED A FAMILY. AND GAVE HOPE.", centerX, centerY - 220, 0);
             // Instructions
-            canvas.setFontAndSize(baseFont, 20);
-            canvas.showTextAligned(Element.ALIGN_CENTER, "We will contact you with further instructions.", centerX, centerY - 210, 0);
+            canvas.setFontAndSize(baseFont, 22); // Instructions font size
+            canvas.showTextAligned(Element.ALIGN_CENTER, "We will contact you with further instructions.", centerX, centerY - 260, 0);
             canvas.endText();
 
             // Remove pill bars. Add social icons and contact at bottom corners.
@@ -82,14 +86,13 @@ public class CertificateService {
             float socialStartY = 48;
             float iconRadius = 18;
             float iconSpacingY = 54;
-            String[] socialNames = {"Facebook", "Instagram", "Twitter", "YouTube"};
+            String[] socialNames = {"Facebook", "Instagram", "LinkedIn"};
             String[] socialUrls = {
-                "facebook.com/santhrupthi",
-                "instagram.com/santhrupthi",
-                "twitter.com/santhrupthi",
-                "youtube.com/santhrupthi"
+                "https://facebook.com/groups/1531070753832737/",
+                "https://www.instagram.com/awo_india",
+                "https://www.linkedin.com/company/theawofoundation/"
             };
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < socialNames.length; i++) {
                 // Draw icon circle (placeholder)
                 canvas.saveState();
                 canvas.setColorFill(BaseColor.WHITE);
@@ -100,8 +103,16 @@ public class CertificateService {
                 canvas.beginText();
                 canvas.setFontAndSize(baseFont, 18);
                 canvas.setColorFill(BaseColor.WHITE);
-                canvas.showTextAligned(Element.ALIGN_RIGHT, socialUrls[i], socialStartX - iconRadius - 24, socialStartY + i * iconSpacingY + 6, 0);
+                canvas.showTextAligned(Element.ALIGN_RIGHT, socialNames[i], socialStartX - iconRadius - 24, socialStartY + i * iconSpacingY + 6, 0);
                 canvas.endText();
+                // Add clickable link annotation
+                float textWidth = baseFont.getWidthPoint(socialNames[i], 18);
+                float llx = socialStartX - iconRadius - 24 - textWidth;
+                float lly = socialStartY + i * iconSpacingY;
+                float urx = socialStartX - iconRadius - 24;
+                float ury = socialStartY + i * iconSpacingY + 18;
+                PdfAnnotation link = PdfAnnotation.createLink(writer, new Rectangle(llx, lly, urx, ury), PdfAnnotation.HIGHLIGHT_INVERT, new PdfAction(socialUrls[i]));
+                writer.addAnnotation(link);
             }
 
             // Need Help at bottom left
@@ -118,9 +129,9 @@ public class CertificateService {
 
             // Overlay tick.png image LAST so it is always on top
             try {
-                String tickImagePath = "tick.png";
+                String tickImagePath = "/static/images/tick.png";
                 logger.info("Loading tick image from: {} (drawn last)", tickImagePath);
-                InputStream tickImageStream = getClass().getClassLoader().getResourceAsStream(tickImagePath);
+                InputStream tickImageStream = getClass().getResourceAsStream(tickImagePath);
                 if (tickImageStream == null) {
                     logger.error("Tick image stream is null. Image not found at path: {}", tickImagePath);
                     throw new Exception("Tick image not found: " + tickImagePath);
