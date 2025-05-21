@@ -313,7 +313,7 @@ public class DonationsController {
 
     @GetMapping("/by-phone/{phone}")
     public ResponseEntity<List<DonationDetailsDTO>> getDonationsByPhone(@PathVariable String phone) {
-        List<Donations> donations = donationRepository.findAllByPhoneOrderByDonationDateDesc(phone);
+        List<Donations> donations = donationRepository.findAllByPhoneAndStatusOrderByDonationDateDesc(phone, "SUCCESS");
         List<DonationDetailsDTO> dtos = donations.stream().map(donation -> {
             DonationDetailsDTO dto = new DonationDetailsDTO();
             dto.setDonationId(donation.getDonationId());
@@ -337,12 +337,11 @@ public class DonationsController {
 
     @GetMapping("/invoice/by-phone/{phone}")
     public ResponseEntity<byte[]> downloadInvoiceByPhone(@PathVariable String phone) {
-        List<Donations> donations = donationRepository.findAllByPhoneOrderByDonationDateDesc(phone);
+        List<Donations> donations = donationRepository.findAllByPhoneAndStatusOrderByDonationDateDesc(phone, "SUCCESS");
         if (donations.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         try {
-            // You need to implement this method in InvoiceService
             byte[] pdf = invoiceService.generateCombinedInvoiceForPhone(phone, donations);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);

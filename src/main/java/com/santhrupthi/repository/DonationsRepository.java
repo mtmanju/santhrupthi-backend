@@ -29,4 +29,6 @@ public interface DonationsRepository extends JpaRepository<Donations, Long> {
     Optional<Donations> findByOrderId(String orderId);
 
     List<Donations> findAllByPhoneOrderByDonationDateDesc(String phone);
+
+    List<Donations> findAllByPhoneAndStatusOrderByDonationDateDesc(String phone, String status);
 } 
