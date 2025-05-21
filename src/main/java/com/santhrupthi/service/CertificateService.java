@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import com.itextpdf.text.pdf.PdfStream;
 
 /**
  * @author Manjunath M T
@@ -26,6 +27,7 @@ public class CertificateService {
             Rectangle pageSize = new Rectangle(1200, 675);
             Document document = new Document(pageSize, 0, 0, 0, 0); // Remove margins
             PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+            writer.setCompressionLevel(PdfStream.BEST_COMPRESSION);
             document.open();
 
             // Add background image (img42.jpg)
@@ -42,6 +44,7 @@ public class CertificateService {
                 Image background = Image.getInstance(org.apache.commons.io.IOUtils.toByteArray(imageStream));
                 background.setAbsolutePosition(0, 0);
                 background.scaleAbsolute(pageSize.getWidth(), pageSize.getHeight());
+                background.setCompressionLevel(9);
                 document.add(background);
             } catch (Exception e) {
                 logger.error("Failed to add background image: {}", e.getMessage());
@@ -85,7 +88,7 @@ public class CertificateService {
                     float tickY = circleCenterY - tickHeight / 2;
                     tickImage.scaleAbsolute(tickWidth, tickHeight);
                     tickImage.setAbsolutePosition(tickX, tickY);
-                    tickImage.setCompressionLevel(0);
+                    tickImage.setCompressionLevel(9);
                     PdfContentByte directContent = writer.getDirectContent();
                     directContent.addImage(tickImage);
                 }
@@ -151,7 +154,7 @@ public class CertificateService {
                     socialIcon.setTransparency(new int[]{0xFF, 0xFF}); // Make fully opaque
                     socialIcon.scaleAbsolute(iconSize, iconSize);
                     socialIcon.setAbsolutePosition(iconX, socialStartY);
-                    socialIcon.setCompressionLevel(0);
+                    socialIcon.setCompressionLevel(9);
                     // Force the image to be rendered
                     PdfContentByte directContent = writer.getDirectContent();
                     directContent.addImage(socialIcon);
