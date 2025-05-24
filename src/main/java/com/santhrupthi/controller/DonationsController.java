@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/donations")
-@CrossOrigin(origins = "http://localhost:3000")
 public class DonationsController {
     private static final Logger logger = LoggerFactory.getLogger(DonationsController.class);
 
