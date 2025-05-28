@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Donation Certificate</title>
+  <style>
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('fonts/Montserrat-Regular.ttf') format('truetype');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('fonts/Montserrat-Bold.ttf') format('truetype');
+      font-weight: 700;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 1366px;
+      height: 768px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: #000;
+    }
+    @page { size: 1366px 768px; margin: 0; }
+    .bg {
+      position: absolute;
+      width: 1366px;
+      height: 768px;
+      left: 0; top: 0;
+      z-index: 0;
+      object-fit: cover;
+    }
+    .overlay {
+      position: absolute;
+      width: 1366px;
+      height: 768px;
+      left: 0; top: 0;
+      background: linear-gradient(0deg, rgba(255,120,0,0.35) 0%, rgba(255,120,0,0.15) 100%);
+      z-index: 1;
+    }
+    .main-content {
+      position: relative;
+      width: 1366px;
+      height: 768px;
+      z-index: 2;
+    }
+    .checkmark {
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 100px;
+      background: #2AC46D;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .checkmark svg {
+      width: 60px;
+      height: 60px;
+      display: block;
+    }
+    .thankyou {
+      position: absolute;
+      top: 170px;
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 2.5rem;
+      letter-spacing: 0.04em;
+    }
+    .redbar {
+      position: absolute;
+      top: 250px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #BA1F2D;
+      padding: 1rem 4rem;
+      min-width: 500px;
+      text-align: center;
+    }
+    .redbar-text {
+      color: #fff;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: 0.04em;
+    }
+    .certificate-donation-thank-you {
+      position: absolute;
+      top: 310px; /* Adjust as needed to fit between redbar and appreciation */
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 2.2rem;
+      letter-spacing: 0.04em;
+      font-family: 'Montserrat', Arial, sans-serif;
+      text-transform: uppercase;
+    }
+    @media (max-width: 640px) {
+      .certificate-donation-thank-you {
+        font-size: 1.1rem !important;
+        top: 285px !important;
+        margin-bottom: 0.25rem !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .certificate-donation-thank-you {
+        font-size: 0.8rem !important;
+        top: 210px !important;
+        margin-bottom: 0.15rem !important;
+      }
+    }
+    .appreciation {
+      position: absolute;
+      top: 350px;
+      width: 100%;
+      text-align: center;
+      color: #FFE600;
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .impact {
+      position: absolute;
+      top: 420px;
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+    .impact span {
+      border-bottom: 2px solid #F16522;
+      padding-bottom: 2px;
+      display: inline-block;
+    }
+    .footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      left: 0;
+      padding: 0 32px 24px 32px;
+      display: table;
+      table-layout: fixed;
+    }
+    .footer-row {
+      display: table-row;
+    }
+    .footer-cell {
+      display: table-cell;
+      vertical-align: bottom;
+    }
+    .footer-logo {
+      background: #fff;
+      border-radius: 40px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 220px;
+      min-height: 70px;
+      height: 70px;
+    }
+    .footer-logo img {
+      width: 50px;
+      height: 50px;
+    }
+    .footer-logo-text {
+      color: #000;
+      font-weight: 700;
+      font-size: 1.2rem;
+      line-height: 1.1;
+    }
+    .footer-logo-sub {
+      color: #000;
+      font-size: 0.9rem;
+      line-height: 1.1;
+    }
+    .footer-center {
+      text-align: center;
+      vertical-align: bottom;
+    }
+    .footer-social {
+      background: #F16522;
+      color: #fff;
+      padding: 4px 16px;
+      border-radius: 9999px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .footer-icons img {
+      width: 24px;
+      height: 24px;
+      margin: 0 4px;
+      vertical-align: middle;
+    }
+    .footer-contact {
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 8px;
+      display: inline-block;
+    }
+    .footer-contact-icon {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .footer-awo {
+      background: #fff;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .footer-awo img {
+      width: 80px;
+      height: 80px;
+    }
+    .footer-bottom {
+      position: absolute;
+      bottom: 8px;
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .footer-bottom .divider {
+      margin: 0 12px;
+      color: #fff;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div style="position:relative; width:1366px; height:768px; overflow:hidden;">
+    <img src="images/certificate-background.jpg" class="bg" alt="Certificate Background" />
+    <div class="overlay"></div>
+    <div class="main-content">
+      <!-- Green Check Circle -->
+      <div class="checkmark">
+        <img src="images/certificate-tick.png" alt="Success" />
+        <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#2AC46D"/><polyline points="18,32 28,42 44,22" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <!-- THANK YOU -->
+      <div class="thankyou">THANK YOU</div>
+      <!-- Redbar (donor name) -->
+      <div class="redbar"><span class="redbar-text">${donorName}</span></div>
+      <!-- FOR YOUR DONATION! -->
+      <div class="certificate-donation-thank-you">FOR YOUR DONATION!</div>
+      <!-- Appreciation Message -->
+      <div class="appreciation">
+        THE ARMS WIDE OPEN FOUNDATION<br />APPRECIATES YOUR DONATION.
+      </div>
+      <!-- You just fed a family... -->
+      <div class="impact">
+        <span>YOU JUST FED A FAMILY. AND GAVE HOPE.</span>
+      </div>
+      <!-- Footer Section -->
+      <div class="footer">
+        <div class="footer-row">
+          <div class="footer-cell" style="width: 320px;">
+            <div class="footer-logo">
+              <img src="images/santhrupthi-logo.png" alt="Santhrupthi Logo" />
+            </div>
+          </div>
+          <div class="footer-cell footer-center">
+            <span class="footer-social">Follow us on:</span>
+            <span class="footer-icons">
+              <img src="images/facebook.png" alt="Facebook" />
+              <img src="images/instagram.png" alt="Instagram" />
+              <img src="images/twitter.png" alt="Twitter" />
+            </span>
+            <div class="footer-contact">
+              <img src="images/phone.png" class="footer-contact-icon" alt="Phone" />
+              Need Help? <b>+91 888 4666 653</b>
+            </div>
+          </div>
+          <div class="footer-cell" style="width: 120px; text-align: right;">
+            <div class="footer-awo">
+              <img src="images/AWO-Logo-01.png" alt="AWO Logo" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Bottom Text -->
+      <div class="footer-bottom">
+        <span>AWO (Arms Wide Open)</span>
+        <span class="divider">|</span>
+        <span>@awo_india</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
