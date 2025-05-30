@@ -50,18 +50,32 @@
       top: 50px;
       left: 50%;
       transform: translateX(-50%);
-      width: 100px;
-      height: 100px;
-      background: #2AC46D;
+      width: 140px;
+      height: 140px;
+      background: none;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .checkmark svg {
-      width: 60px;
-      height: 60px;
-      display: block;
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      left: 0;
+      top: 0;
+      z-index: 1;
+    }
+    .checkmark-tick {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      object-fit: contain;
+      pointer-events: none;
     }
     .thankyou {
       position: absolute;
@@ -69,8 +83,8 @@
       width: 100%;
       text-align: center;
       color: #fff;
-      font-weight: 700;
-      font-size: 2.5rem;
+      font-weight: 900;
+      font-size: 3.2rem;
       letter-spacing: 0.04em;
     }
     .redbar {
@@ -89,10 +103,11 @@
       font-weight: 700;
       margin: 0;
       letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
     .certificate-donation-thank-you {
       position: absolute;
-      top: 310px; /* Adjust as needed to fit between redbar and appreciation */
+      top: 340px;
       width: 100%;
       text-align: center;
       color: #fff;
@@ -118,7 +133,7 @@
     }
     .appreciation {
       position: absolute;
-      top: 350px;
+      top: 380px;
       width: 100%;
       text-align: center;
       color: #FFE600;
@@ -128,7 +143,7 @@
     }
     .impact {
       position: absolute;
-      top: 420px;
+      top: 450px;
       width: 100%;
       text-align: center;
       color: #fff;
@@ -159,17 +174,21 @@
     .footer-logo {
       background: #fff;
       border-radius: 40px;
-      padding: 16px 24px;
+      padding: 0;
       display: flex;
       align-items: center;
-      gap: 16px;
-      min-width: 220px;
+      justify-content: center;
+      min-width: 0;
       min-height: 70px;
       height: 70px;
+      width: 300px;
+      box-sizing: border-box;
     }
     .footer-logo img {
-      width: 50px;
-      height: 50px;
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+      display: block;
     }
     .footer-logo-text {
       color: #000;
@@ -185,6 +204,7 @@
     .footer-center {
       text-align: center;
       vertical-align: bottom;
+      padding: 0;
     }
     .footer-social {
       background: #F16522;
@@ -218,16 +238,18 @@
     .footer-awo {
       background: #fff;
       border-radius: 50%;
-      width: 80px;
-      height: 80px;
+      width: 140px;
+      height: 140px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      margin-right: 32px;
+      margin-bottom: 24px;
     }
     .footer-awo img {
-      width: 80px;
-      height: 80px;
+      width: 140px;
+      height: 140px;
     }
     .footer-bottom {
       position: absolute;
@@ -243,17 +265,52 @@
       color: #fff;
       opacity: 0.7;
     }
+    .footer-center-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+    .footer-contact {
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+    }
+    .footer-bottom-link {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+    .footer-bottom-link:hover {
+      color: #FFE600;
+    }
+    .footer-bottom-icon {
+      width: 1.2em;
+      height: 1.2em;
+      vertical-align: middle;
+      object-fit: contain;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
   <div style="position:relative; width:1366px; height:768px; overflow:hidden;">
-    <img src="images/certificate-background.jpg" class="bg" alt="Certificate Background" />
+    <img src="images/certificate-background.jpeg" class="bg" alt="Certificate Background" />
     <div class="overlay"></div>
     <div class="main-content">
       <!-- Green Check Circle -->
       <div class="checkmark">
-        <img src="images/certificate-tick.png" alt="Success" />
-        <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#2AC46D"/><polyline points="18,32 28,42 44,22" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#2AC46D"/></svg>
+        <img src="images/certificate-background-tick.png" alt="Success" class="checkmark-tick" />
       </div>
       <!-- THANK YOU -->
       <div class="thankyou">THANK YOU</div>
@@ -278,29 +335,46 @@
             </div>
           </div>
           <div class="footer-cell footer-center">
-            <span class="footer-social">Follow us on:</span>
-            <span class="footer-icons">
-              <img src="images/facebook.png" alt="Facebook" />
-              <img src="images/instagram.png" alt="Instagram" />
-              <img src="images/twitter.png" alt="Twitter" />
-            </span>
-            <div class="footer-contact">
-              <img src="images/phone.png" class="footer-contact-icon" alt="Phone" />
-              Need Help? <b>+91 888 4666 653</b>
+            <div class="footer-center-row">
+              <span class="footer-social">Follow us on:</span>
+              <span class="footer-icons">
+                <a href="https://facebook.com/groups/1531070753832737/" target="_blank" rel="noopener noreferrer">
+                  <img src="images/facebook.png" alt="Facebook" />
+                </a>
+                <a href="https://www.instagram.com/awo_india" target="_blank" rel="noopener noreferrer">
+                  <img src="images/instagram.png" alt="Instagram" />
+                </a>
+                <a href="https://www.linkedin.com/company/theawofoundation/" target="_blank" rel="noopener noreferrer">
+                  <img src="images/linkedin.png" alt="LinkedIn" />
+                </a>
+                <a href="https://www.youtube.com/@armswideopenindia" target="_blank" rel="noopener noreferrer">
+                  <img src="images/youtube.png" alt="YouTube" />
+                </a>
+              </span>
+              <span class="footer-contact">
+                <img src="images/phone.png" class="footer-contact-icon" alt="Phone" />
+                Need Help? <b>+91 888 4666 653</b>
+              </span>
             </div>
           </div>
           <div class="footer-cell" style="width: 120px; text-align: right;">
             <div class="footer-awo">
-              <img src="images/AWO-Logo-01.png" alt="AWO Logo" />
+              <img src="images/awo-logo.png" alt="AWO Logo" />
             </div>
           </div>
         </div>
       </div>
       <!-- Footer Bottom Text -->
       <div class="footer-bottom">
-        <span>AWO (Arms Wide Open)</span>
+        <a href="https://facebook.com/groups/1531070753832737/" target="_blank" class="footer-bottom-link">
+          <img src="images/facebook-app-symbol.png" alt="Facebook" class="footer-bottom-icon" />
+          AWO (Arms Wide Open)
+        </a>
         <span class="divider">|</span>
-        <span>@awo_india</span>
+        <a href="https://www.instagram.com/awo_india" target="_blank" class="footer-bottom-link">
+          <img src="images/instagram-app-symbol.png" alt="Instagram" class="footer-bottom-icon" />
+          @awo_india
+        </a>
       </div>
     </div>
   </div>

@@ -1,17 +1,12 @@
 package com.santhrupthi.service;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import com.itextpdf.text.pdf.PdfStream;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import org.springframework.core.io.ClassPathResource;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 /**
  * @author Manjunath M T
