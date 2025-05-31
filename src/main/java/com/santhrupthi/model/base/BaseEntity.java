@@ -10,6 +10,11 @@ import java.util.Date;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
+/**
+ * @author Manjunath M T
+ * @version 1.0
+ * @since 2025-05-04
+ */
 @Getter
 @Setter
 @MappedSuperclass

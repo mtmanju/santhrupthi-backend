@@ -4,6 +4,11 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * @author Manjunath M T
+ * @version 1.0
+ * @since 2025-05-04
+ */
 @Data
 public class DonationDetailsDTO {
     private String donationId;

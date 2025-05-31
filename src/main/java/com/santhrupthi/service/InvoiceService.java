@@ -1,165 +1,105 @@
 package com.santhrupthi.service;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 
+/**
+ * @author Manjunath M T
+ * @version 1.0
+ * @since 2025-05-04
+ */
 @Service
 public class InvoiceService {
     public byte[] generateInvoice(
         String donationId, Date donationDate, String name, String phone, String email, BigDecimal amount,
         String panCard, String address, String message, String currency, String paymentMethod, String orderId, String paymentId, String status
-    ) throws DocumentException, java.io.IOException {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            Document document = new Document(PageSize.A4, 36, 36, 36, 36);
-            PdfWriter.getInstance(document, outputStream);
-            document.open();
+    ) throws java.io.IOException {
+        String html = loadInvoiceHtmlTemplate();
+        String addressHtml = (address != null && !address.trim().isEmpty()) ? "<div><span style=\"font-weight:700\">Address:</span> " + address + "</div>" : "";
+        String panHtml = (panCard != null && !panCard.trim().isEmpty()) ? "<div><span style=\"font-weight:700\">PAN:</span> " + panCard + "</div>" : "";
+        html = html.replace("${donorName}", name != null ? name : "-")
+                   .replace("${email}", email != null ? email : "-")
+                   .replace("${phone}", phone != null ? phone : "-")
+                   .replace("${addressBlock}", addressHtml)
+                   .replace("${panBlock}", panHtml)
+                   .replace("${orderId}", orderId != null ? orderId : "-")
+                   .replace("${paymentId}", paymentId != null ? paymentId : "-")
+                   .replace("${status}", status != null ? status : "-")
+                   .replace("${paymentMethod}", paymentMethod != null ? paymentMethod : "-")
+                   .replace("${message}", message != null ? message : "-")
+                   .replace("${donationId}", donationId != null ? donationId : "-")
+                   .replace("${donationDate}", donationDate != null ? new SimpleDateFormat("dd/MM/yyyy, hh:mm:ss a").format(donationDate) : "-")
+                   .replace("${amount}", amount != null ? amount.toString() : "0");
+        return renderHtmlToPdf(html);
+    }
 
-            // Header
-            Font headerFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.DARK_GRAY);
-            Paragraph header = new Paragraph("AWO Foundation\nDonation Receipt", headerFont);
-            header.setAlignment(Element.ALIGN_CENTER);
-            document.add(header);
+    private String[] loadInvoiceTemplateParts() throws java.io.IOException {
+        String template = loadInvoiceHtmlTemplate();
+        int headStart = template.indexOf("<head>");
+        int headEnd = template.indexOf("</head>") + 7;
+        String head = template.substring(headStart, headEnd);
+        String body = template.substring(template.indexOf("<body>"), template.indexOf("<!--INVOICE_START-->") + "<!--INVOICE_START-->".length());
+        String invoiceContent = template.substring(template.indexOf("<!--INVOICE_START-->") + "<!--INVOICE_START-->".length(), template.indexOf("<!--INVOICE_END-->"));
+        return new String[] { head, body, invoiceContent };
+    }
 
-            // Org details
-            Font orgFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.GRAY);
-            Paragraph orgDetails = new Paragraph("3rd Cross CB Upparahalli Tumakuru Karnataka\nPhone: +91 888 4666 653 | Email: armswideopen.india@gmail.com", orgFont);
-            orgDetails.setAlignment(Element.ALIGN_CENTER);
-            orgDetails.setSpacingAfter(16);
-            document.add(orgDetails);
+    public byte[] generateCombinedInvoiceForPhone(String phone, List<com.santhrupthi.model.Donations> donations) throws java.io.IOException {
+        String[] templateParts = loadInvoiceTemplateParts();
+        String head = templateParts[0];
+        String invoiceContent = templateParts[2];
+        StringBuilder bodyBuilder = new StringBuilder();
+        for (int i = 0; i < donations.size(); i++) {
+            com.santhrupthi.model.Donations d = donations.get(i);
+            String html = invoiceContent;
+            String addressHtml = (d.getAddress() != null && !d.getAddress().trim().isEmpty()) ? "<div><span style=\"font-weight:700\">Address:</span> " + d.getAddress() + "</div>" : "";
+            String panHtml = (d.getPanCard() != null && !d.getPanCard().trim().isEmpty()) ? "<div><span style=\"font-weight:700\">PAN:</span> " + d.getPanCard() + "</div>" : "";
+            html = html.replace("${donorName}", d.getName() != null ? d.getName() : "-")
+                       .replace("${email}", d.getEmail() != null ? d.getEmail() : "-")
+                       .replace("${phone}", d.getPhone() != null ? d.getPhone() : "-")
+                       .replace("${addressBlock}", addressHtml)
+                       .replace("${panBlock}", panHtml)
+                       .replace("${orderId}", d.getOrderId() != null ? d.getOrderId() : "-")
+                       .replace("${paymentId}", d.getPaymentId() != null ? d.getPaymentId() : "-")
+                       .replace("${status}", d.getStatus() != null ? d.getStatus() : "-")
+                       .replace("${paymentMethod}", d.getPaymentMethod() != null ? d.getPaymentMethod() : "-")
+                       .replace("${message}", d.getMessage() != null ? d.getMessage() : "-")
+                       .replace("${donationId}", d.getDonationId() != null ? d.getDonationId() : "-")
+                       .replace("${donationDate}", d.getDonationDate() != null ? new SimpleDateFormat("dd/MM/yyyy, hh:mm:ss a").format(d.getDonationDate()) : "-")
+                       .replace("${amount}", d.getAmount() != null ? d.getAmount().toString() : "0");
+            bodyBuilder.append(html);
+            if (i < donations.size() - 1) {
+                bodyBuilder.append("<div style='page-break-after: always'></div>");
+            }
+        }
+        String combinedHtml = "<!DOCTYPE html><html>" + head + "<body>" + bodyBuilder.toString() + "</body></html>";
+        return renderHtmlToPdf(combinedHtml);
+    }
 
-            // Invoice meta
-            PdfPTable metaTable = new PdfPTable(2);
-            metaTable.setWidthPercentage(100);
-            metaTable.setSpacingAfter(12);
-            metaTable.addCell(getCell("Receipt #:", PdfPCell.ALIGN_LEFT, true));
-            metaTable.addCell(getCell(donationId, PdfPCell.ALIGN_LEFT, false));
-            metaTable.addCell(getCell("Date:", PdfPCell.ALIGN_LEFT, true));
-            metaTable.addCell(getCell(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(donationDate), PdfPCell.ALIGN_LEFT, false));
-            document.add(metaTable);
-
-            // Donor & Donation details
-            PdfPTable detailsTable = new PdfPTable(2);
-            detailsTable.setWidthPercentage(100);
-            detailsTable.setSpacingAfter(12);
-            detailsTable.addCell(getCell("Donor Details", PdfPCell.ALIGN_LEFT, true));
-            detailsTable.addCell(getCell("Donation Details", PdfPCell.ALIGN_LEFT, true));
-            detailsTable.addCell(getCell("Name: " + name, PdfPCell.ALIGN_LEFT, false));
-            detailsTable.addCell(getCell("Order ID: " + orderId, PdfPCell.ALIGN_LEFT, false));
-            detailsTable.addCell(getCell("Email: " + email, PdfPCell.ALIGN_LEFT, false));
-            detailsTable.addCell(getCell("Payment ID: " + paymentId, PdfPCell.ALIGN_LEFT, false));
-            detailsTable.addCell(getCell("Phone: " + phone, PdfPCell.ALIGN_LEFT, false));
-            detailsTable.addCell(getCell("Status: " + status, PdfPCell.ALIGN_LEFT, false));
-            detailsTable.addCell(getCell("PAN: " + (panCard != null ? panCard : "-"), PdfPCell.ALIGN_LEFT, false));
-            detailsTable.addCell(getCell("Method: " + (paymentMethod != null ? paymentMethod : "-"), PdfPCell.ALIGN_LEFT, false));
-            detailsTable.addCell(getCell("Address: " + (address != null ? address : "-"), PdfPCell.ALIGN_LEFT, false));
-            detailsTable.addCell(getCell("Message: " + (message != null ? message : "-"), PdfPCell.ALIGN_LEFT, false));
-            document.add(detailsTable);
-
-            // Amount Table
-            PdfPTable amountTable = new PdfPTable(2);
-            amountTable.setWidthPercentage(60);
-            amountTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            amountTable.addCell(getCell("Description", PdfPCell.ALIGN_LEFT, true));
-            amountTable.addCell(getCell("Amount", PdfPCell.ALIGN_RIGHT, true));
-            amountTable.addCell(getCell("Donation to Santhrupthi Foundation", PdfPCell.ALIGN_LEFT, false));
-            amountTable.addCell(getCell("₹" + amount, PdfPCell.ALIGN_RIGHT, false));
-            amountTable.addCell(getCell("Total", PdfPCell.ALIGN_LEFT, true));
-            amountTable.addCell(getCell("₹" + amount, PdfPCell.ALIGN_RIGHT, true));
-            document.add(amountTable);
-
-            // Footer
-            Paragraph thanks = new Paragraph("Thank you for your generous contribution! This receipt can be used for your records and tax purposes.", orgFont);
-            thanks.setSpacingBefore(20);
-            thanks.setAlignment(Element.ALIGN_CENTER);
-            document.add(thanks);
-
-            document.close();
-            return outputStream.toByteArray();
+    private String loadInvoiceHtmlTemplate() throws java.io.IOException {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("templates/invoice-template.html")) {
+            if (is == null) throw new RuntimeException("invoice-template.html not found in classpath");
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
-    public byte[] generateCombinedInvoiceForPhone(String phone, List<com.santhrupthi.model.Donations> donations) throws DocumentException, java.io.IOException {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            Document document = new Document(PageSize.A4, 36, 36, 36, 36);
-            PdfWriter.getInstance(document, outputStream);
-            document.open();
-
-            // Header
-            Font headerFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.DARK_GRAY);
-            Paragraph header = new Paragraph("Santhrupthi Foundation\nDonation Invoice (All Donations)", headerFont);
-            header.setAlignment(Element.ALIGN_CENTER);
-            document.add(header);
-
-            // Org details
-            Font orgFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.GRAY);
-            Paragraph orgDetails = new Paragraph("3rd Cross CB Upparahalli Tumakuru Karnataka\nPhone: +91 888 4666 653 | Email: armswideopen.india@gmail.com", orgFont);
-            orgDetails.setAlignment(Element.ALIGN_CENTER);
-            orgDetails.setSpacingAfter(16);
-            document.add(orgDetails);
-
-            // Donor meta
-            if (!donations.isEmpty()) {
-                com.santhrupthi.model.Donations first = donations.get(0);
-                PdfPTable metaTable = new PdfPTable(2);
-                metaTable.setWidthPercentage(100);
-                metaTable.setSpacingAfter(12);
-                metaTable.addCell(getCell("Name:", PdfPCell.ALIGN_LEFT, true));
-                metaTable.addCell(getCell(first.getName(), PdfPCell.ALIGN_LEFT, false));
-                metaTable.addCell(getCell("Phone:", PdfPCell.ALIGN_LEFT, true));
-                metaTable.addCell(getCell(first.getPhone(), PdfPCell.ALIGN_LEFT, false));
-                metaTable.addCell(getCell("Email:", PdfPCell.ALIGN_LEFT, true));
-                metaTable.addCell(getCell(first.getEmail(), PdfPCell.ALIGN_LEFT, false));
-                document.add(metaTable);
-            }
-
-            // Donations Table
-            PdfPTable table = new PdfPTable(4);
-            table.setWidthPercentage(100);
-            table.setSpacingBefore(10);
-            table.setSpacingAfter(10);
-            table.addCell(getCell("Date", PdfPCell.ALIGN_LEFT, true));
-            table.addCell(getCell("Donation ID", PdfPCell.ALIGN_LEFT, true));
-            table.addCell(getCell("Amount", PdfPCell.ALIGN_RIGHT, true));
-            table.addCell(getCell("Status", PdfPCell.ALIGN_LEFT, true));
-            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
-            java.math.BigDecimal total = java.math.BigDecimal.ZERO;
-            for (com.santhrupthi.model.Donations d : donations) {
-                table.addCell(getCell(sdf.format(d.getDonationDate()), PdfPCell.ALIGN_LEFT, false));
-                table.addCell(getCell(d.getDonationId(), PdfPCell.ALIGN_LEFT, false));
-                table.addCell(getCell("₹" + d.getAmount(), PdfPCell.ALIGN_RIGHT, false));
-                table.addCell(getCell(d.getStatus(), PdfPCell.ALIGN_LEFT, false));
-                if (d.getAmount() != null) total = total.add(d.getAmount());
-            }
-            // Total row
-            table.addCell(getCell("", PdfPCell.ALIGN_LEFT, false));
-            table.addCell(getCell("Total", PdfPCell.ALIGN_RIGHT, true));
-            table.addCell(getCell("₹" + total, PdfPCell.ALIGN_RIGHT, true));
-            table.addCell(getCell("", PdfPCell.ALIGN_LEFT, false));
-            document.add(table);
-
-            // Footer
-            Paragraph thanks = new Paragraph("Thank you for your generous contributions! This invoice summarizes all your donations.", orgFont);
-            thanks.setSpacingBefore(20);
-            thanks.setAlignment(Element.ALIGN_CENTER);
-            document.add(thanks);
-
-            document.close();
-            return outputStream.toByteArray();
+    private byte[] renderHtmlToPdf(String html) throws java.io.IOException {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            PdfRendererBuilder builder = new PdfRendererBuilder();
+            String baseUri = getClass().getResource("/templates/").toString();
+            builder.withHtmlContent(html, baseUri);
+            builder.toStream(os);
+            builder.useDefaultPageSize(210, 297, PdfRendererBuilder.PageSizeUnits.MM);
+            builder.run();
+            return os.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to render invoice PDF: " + e.getMessage(), e);
         }
-    }
-
-    private PdfPCell getCell(String text, int alignment, boolean bold) {
-        Font font = new Font(Font.FontFamily.HELVETICA, 10, bold ? Font.BOLD : Font.NORMAL);
-        PdfPCell cell = new PdfPCell(new Phrase(text, font));
-        cell.setPadding(4);
-        cell.setHorizontalAlignment(alignment);
-        cell.setBorder(PdfPCell.NO_BORDER);
-        return cell;
     }
 } 

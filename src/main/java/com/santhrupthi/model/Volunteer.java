@@ -3,6 +3,11 @@ package com.santhrupthi.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * @author Manjunath M T
+ * @version 1.0
+ * @since 2025-05-04
+ */
 @Entity
 public class Volunteer {
     @Id

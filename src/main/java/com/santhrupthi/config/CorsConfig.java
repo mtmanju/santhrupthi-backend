@@ -9,6 +9,11 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
+/**
+ * @author Manjunath M T
+ * @version 1.0
+ * @since 2025-05-04
+ */
 @Configuration
 public class CorsConfig {
     @Value("#{'${cors.allowed-origins}'.split(',')}")

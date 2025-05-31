@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 import java.util.Date;
 
-
 import com.santhrupthi.model.base.BaseEntity;
 
 /**
