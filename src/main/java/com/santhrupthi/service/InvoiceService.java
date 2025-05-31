@@ -22,13 +22,13 @@ public class InvoiceService {
 
             // Header
             Font headerFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.DARK_GRAY);
-            Paragraph header = new Paragraph("Santhrupthi Foundation\nDonation Receipt", headerFont);
+            Paragraph header = new Paragraph("AWO Foundation\nDonation Receipt", headerFont);
             header.setAlignment(Element.ALIGN_CENTER);
             document.add(header);
 
             // Org details
             Font orgFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.GRAY);
-            Paragraph orgDetails = new Paragraph("123 Charity Lane, Bengaluru, KA 560001\nPhone: +91 888 4666 653 | Email: info@santhrupthi.org", orgFont);
+            Paragraph orgDetails = new Paragraph("3rd Cross CB Upparahalli Tumakuru Karnataka\nPhone: +91 888 4666 653 | Email: armswideopen.india@gmail.com", orgFont);
             orgDetails.setAlignment(Element.ALIGN_CENTER);
             orgDetails.setSpacingAfter(16);
             document.add(orgDetails);
@@ -98,7 +98,7 @@ public class InvoiceService {
 
             // Org details
             Font orgFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.GRAY);
-            Paragraph orgDetails = new Paragraph("123 Charity Lane, Bengaluru, KA 560001\nPhone: +91 888 4666 653 | Email: info@santhrupthi.org", orgFont);
+            Paragraph orgDetails = new Paragraph("3rd Cross CB Upparahalli Tumakuru Karnataka\nPhone: +91 888 4666 653 | Email: armswideopen.india@gmail.com", orgFont);
             orgDetails.setAlignment(Element.ALIGN_CENTER);
             orgDetails.setSpacingAfter(16);
             document.add(orgDetails);
