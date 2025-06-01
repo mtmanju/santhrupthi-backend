@@ -174,11 +174,17 @@ public class DonationsController {
 
             // Fetch payment details from Razorpay
             RazorpayClient razorpay = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
-            Payment razorpayPayment = razorpay.payments.fetch(razorpayPaymentId);
+            Payment razorpayPayment = null;
+            try {
+                razorpayPayment = razorpay.payments.fetch(razorpayPaymentId);
+            } catch (Exception ex) {
+                logger.error("Failed to fetch payment from Razorpay for paymentId {}: {}", razorpayPaymentId, ex.getMessage(), ex);
+                return ResponseEntity.badRequest().body(null);
+            }
             String paymentStatus = razorpayPayment.get("status");
-            logger.info("Fetched payment status from Razorpay: {}", paymentStatus);
+            logger.info("Fetched payment status from Razorpay: {} | Payment object: {}", paymentStatus, razorpayPayment.toString());
             if (!"captured".equals(paymentStatus)) {
-                String errorMsg = String.format("Payment not captured. Current status: %s.", paymentStatus);
+                String errorMsg = String.format("Payment not captured. Current status: %s. Full payment object: %s", paymentStatus, razorpayPayment.toString());
                 logger.error(errorMsg);
                 return ResponseEntity.badRequest().body(null);
             }
@@ -349,6 +355,43 @@ public class DonationsController {
         } catch (Exception e) {
             logger.error("Error generating combined invoice PDF: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // --- Razorpay Webhook Endpoint ---
+    @PostMapping("/razorpay-webhook")
+    public ResponseEntity<String> handleRazorpayWebhook(@RequestBody String payload, @RequestHeader Map<String, String> headers) {
+        logger.info("Received Razorpay webhook: headers={}, payload={}", headers, payload);
+        try {
+            // Parse payload and handle payment.captured event
+            org.json.JSONObject event = new org.json.JSONObject(payload);
+            String eventType = event.optString("event");
+            if ("payment.captured".equals(eventType)) {
+                org.json.JSONObject paymentEntity = event.getJSONObject("payload").getJSONObject("payment").getJSONObject("entity");
+                String razorpayPaymentId = paymentEntity.getString("id");
+                String orderId = paymentEntity.optString("order_id", null);
+                logger.info("Webhook payment.captured for paymentId={}, orderId={}", razorpayPaymentId, orderId);
+                if (orderId != null) {
+                    Optional<Donations> donationOpt = donationRepository.findByOrderId(orderId);
+                    if (donationOpt.isPresent()) {
+                        Donations donation = donationOpt.get();
+                        donation.setStatus("SUCCESS");
+                        donation.setPaymentMethod(paymentEntity.optString("method", null));
+                        donation.setSignature(paymentEntity.optString("signature", null));
+                        donation.setDonationDate(new java.util.Date());
+                        donation.setPaymentId(razorpayPaymentId);
+                        donation.setOrderId(orderId);
+                        donationRepository.save(donation);
+                        logger.info("Donation updated from webhook for orderId={}", orderId);
+                    } else {
+                        logger.error("No donation found for orderId {} in webhook", orderId);
+                    }
+                }
+            }
+            return ResponseEntity.ok("Webhook processed");
+        } catch (Exception e) {
+            logger.error("Error processing Razorpay webhook: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body("Webhook error");
         }
     }
 } 
